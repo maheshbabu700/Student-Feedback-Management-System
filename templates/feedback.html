@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Feedback Form</title>
+  <!-- Relative path works when opening this file directly from the templates folder -->
+  <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+  <main class="page">
+    <section class="card">
+      <header class="card-header">
+        <h1>Student Feedback Form</h1>
+        <p>Tell us about your experience with a faculty member and course. Your feedback helps improve teaching.</p>
+      </header>
+
+      <!-- novalidate: JavaScript does the validation so we can show our own messages -->
+      <noscript><p class="status fail">This form needs JavaScript. Please enable JavaScript in your browser and reload the page.</p></noscript>
+      <form id="feedbackForm" novalidate>
+
+        <!-- Student name -->
+        <div class="field">
+          <label for="student_name">Student name <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="student_name" name="student_name" placeholder="e.g. Ravi Kumar" autocomplete="name" aria-describedby="student_name_error">
+          <p class="error" id="student_name_error" role="alert"></p>
+        </div>
+
+        <!-- Student ID -->
+        <div class="field">
+          <label for="student_id">Student ID / Roll number <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="student_id" name="student_id" placeholder="e.g. 22A91A0501" autocomplete="off" aria-describedby="student_id_error">
+          <p class="error" id="student_id_error" role="alert"></p>
+        </div>
+
+        <!-- Faculty and course side by side on wide screens -->
+        <div class="row">
+          <div class="field">
+            <label for="faculty_id">Faculty <span class="req" aria-hidden="true">*</span></label>
+            <select id="faculty_id" name="faculty_id" aria-describedby="faculty_id_error"></select>
+            <p class="error" id="faculty_id_error" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label for="course_id">Course <span class="req" aria-hidden="true">*</span></label>
+            <select id="course_id" name="course_id" aria-describedby="course_id_error"></select>
+            <p class="error" id="course_id_error" role="alert"></p>
+          </div>
+        </div>
+
+        <!-- Star rating (radio inputs give us free keyboard support: arrow keys) -->
+        <fieldset class="field rating-field" aria-describedby="rating_error">
+          <legend>Rating <span class="req" aria-hidden="true">*</span></legend>
+          <div class="stars" id="stars">
+            <!-- Stars are created by feedback.js from the RATING_LABELS list -->
+          </div>
+          <p class="rating-text" id="ratingText" aria-live="polite">No rating selected</p>
+          <input type="hidden" id="rating" name="rating" value="">
+          <p class="error" id="rating_error" role="alert"></p>
+        </fieldset>
+
+        <!-- Comments -->
+        <div class="field">
+          <label for="comments">Comments and suggestions <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="comments" name="comments" rows="5" maxlength="1000" placeholder="What went well? What could be better?" aria-describedby="comments_error"></textarea>
+          <p class="error" id="comments_error" role="alert"></p>
+        </div>
+
+        <button type="submit" class="submit-btn">Submit feedback</button>
+
+        <!-- Success / summary message -->
+        <div id="formStatus" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+  </main>
+
+  <script src="../static/js/feedback.js"></script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+/* ===== Colour and spacing settings (change here to restyle everything) ===== */
+:root {
+  --blue-900: #0b2a5b;
+  --blue-700: #1457b8;
+  --blue-600: #1d6fe0;
+  --blue-100: #e6f0fd;
+  --blue-50:  #f3f8ff;
+  --text:     #1b2a41;
+  --muted:    #5b6b82;
+  --border:   #c9d6e8;
+  --error:    #c62828;
+  --success:  #1b6e3c;
+  --star-off: #c9d6e8;
+  --star-on:  #f5a623;
+  --radius:   10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  color: var(--text);
+  background: var(--blue-50);
+  line-height: 1.5;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px 16px;
+}
+
+/* ===== Card ===== */
+.card {
+  width: 100%;
+  max-width: 640px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: 6px solid var(--blue-700);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 24px rgba(11, 42, 91, 0.1);
+  padding: 32px;
+}
+
+.card-header { margin-bottom: 24px; }
+.card-header h1 { margin: 0 0 8px; font-size: 1.75rem; color: var(--blue-900); }
+.card-header p { margin: 0; color: var(--muted); }
+
+/* ===== Fields ===== */
+.field { margin-bottom: 20px; border: 0; padding: 0; min-width: 0; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+label, legend { display: block; font-weight: 600; margin-bottom: 6px; padding: 0; }
+.req { color: var(--error); }
+
+input[type="text"], select, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text);
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+}
+textarea { resize: vertical; }
+
+input:hover, select:hover, textarea:hover { border-color: var(--blue-600); }
+
+input:focus, select:focus, textarea:focus {
+  outline: 3px solid var(--blue-100);
+  border-color: var(--blue-700);
+}
+
+/* Red border for invalid fields (class added by JavaScript) */
+.invalid { border-color: var(--error) !important; }
+
+.error { color: var(--error); font-size: 0.875rem; margin: 6px 0 0; min-height: 0; }
+.error:empty { display: none; }
+
+/* ===== Star rating ===== */
+.stars { display: flex; gap: 4px; position: relative; }
+
+/* Hide the radio circle visually but keep it keyboard accessible */
+.stars input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.stars label {
+  margin: 0;
+  font-size: 2.2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--star-off);
+  transition: color 0.1s;
+  padding: 2px;
+  border-radius: 6px;
+}
+
+.stars label.filled { color: var(--star-on); }
+
+/* Keyboard focus ring on the star that has focus */
+.stars input:focus-visible + label {
+  outline: 3px solid var(--blue-600);
+  outline-offset: 2px;
+}
+
+.rating-text { margin: 6px 0 0; color: var(--muted); font-size: 0.95rem; }
+.rating-text.chosen { color: var(--blue-700); font-weight: 600; }
+
+/* ===== Button ===== */
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--blue-700);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.submit-btn:hover { background: var(--blue-900); }
+.submit-btn:focus-visible { outline: 3px solid var(--blue-600); outline-offset: 3px; }
+
+/* ===== Status message ===== */
+.status { margin-top: 20px; border-radius: 8px; }
+.status:empty { display: none; }
+.status.success {
+  padding: 14px 16px;
+  color: var(--success);
+  background: #eaf7ef;
+  border: 1px solid #a8d8b9;
+}
+.status.success strong { display: block; margin-bottom: 4px; }
+.status.fail {
+  padding: 14px 16px;
+  color: var(--error);
+  background: #fdecec;
+  border: 1px solid #f1b5b5;
+}
+
+/* ===== Small screens ===== */
+@media (max-width: 560px) {
+  .card { padding: 22px 18px; }
+  .row { grid-template-columns: 1fr; gap: 0; }
+  .card-header h1 { font-size: 1.45rem; }
+  .stars label { font-size: 2.6rem; }
+}
