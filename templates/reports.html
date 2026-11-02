@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% from "_macros.html" import summary_table %}
+
+{% block title %}Reports{% endblock %}
+{% block eyebrow %}Analysis{% endblock %}
+{% block page_title %}Feedback reports{% endblock %}
+{% block page_subtitle %}Analyse student ratings and compare feedback across faculty and courses.{% endblock %}
+
+{% block page_actions %}
+    <a class="btn btn--ghost" href="{{ url_for('feedback') }}">
+        <svg class="icon" aria-hidden="true"><use href="#i-records"></use></svg>
+        View feedback records
+    </a>
+{% endblock %}
+
+{% block content %}
+    {% set has_ratings = rating_distribution|sum(attribute='count') > 0 %}
+
+    <p class="chart-fallback" data-chart-error hidden style="margin: 0 0 var(--space-5);">
+        <svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>
+        Charts could not load. Check your internet connection and refresh the page. The tables below still show the full data.
+    </p>
+
+    <section class="panel" aria-labelledby="dist-title">
+        <div class="panel__head">
+            <h2 id="dist-title">Rating distribution</h2>
+            <p>Number of submissions received for each star rating.</p>
+        </div>
+        {% if has_ratings %}
+            <div class="chart-box">
+                <canvas data-chart="rating" role="img" aria-label="Bar chart of feedback submissions for each star rating from 1 to 5"></canvas>
+            </div>
+        {% else %}
+            <div class="empty">
+                <svg class="icon" aria-hidden="true"><use href="#i-inbox"></use></svg>
+                <strong>No feedback yet</strong>
+                The rating distribution will appear once feedback is submitted.
+            </div>
+        {% endif %}
+    </section>
+
+    <div class="grid grid--2">
+        <section class="panel" aria-labelledby="fac-chart-title">
+            <div class="panel__head">
+                <h2 id="fac-chart-title">Average rating by faculty</h2>
+                <p>Mean rating out of 5 for each faculty member.</p>
+            </div>
+            {% if faculty_report %}
+                <div class="chart-box">
+                    <canvas data-chart="faculty" role="img" aria-label="Bar chart of average rating for each faculty ID"></canvas>
+                </div>
+            {% else %}
+                <div class="empty empty--sm">
+                    <svg class="icon" aria-hidden="true"><use href="#i-inbox"></use></svg>
+                    No faculty feedback is available.
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="panel" aria-labelledby="crs-chart-title">
+            <div class="panel__head">
+                <h2 id="crs-chart-title">Average rating by course</h2>
+                <p>Mean rating out of 5 for each course.</p>
+            </div>
+            {% if course_report %}
+                <div class="chart-box">
+                    <canvas data-chart="course" role="img" aria-label="Bar chart of average rating for each course ID"></canvas>
+                </div>
+            {% else %}
+                <div class="empty empty--sm">
+                    <svg class="icon" aria-hidden="true"><use href="#i-inbox"></use></svg>
+                    No course feedback is available.
+                </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <div class="grid grid--2">
+        <section class="panel" aria-labelledby="fac-tbl-title">
+            <div class="panel__head">
+                <h2 id="fac-tbl-title">Faculty report</h2>
+                <p>Submission count and average rating per faculty.</p>
+            </div>
+            {{ summary_table(faculty_report, 'Faculty ID') }}
+        </section>
+
+        <section class="panel" aria-labelledby="crs-tbl-title">
+            <div class="panel__head">
+                <h2 id="crs-tbl-title">Course report</h2>
+                <p>Submission count and average rating per course.</p>
+            </div>
+            {{ summary_table(course_report, 'Course ID', true) }}
+        </section>
+    </div>
+
+    <script id="chart-data" type="application/json">{{ {'rating': rating_distribution, 'faculty': faculty_report, 'course': course_report}|tojson }}</script>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

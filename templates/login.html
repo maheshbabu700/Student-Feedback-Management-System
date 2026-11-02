@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <title>Admin Login | Student Feedback System</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="login-body">
+    {% include "_icons.html" %}
+
+    <div class="login">
+        <section class="login__aside" aria-label="About this system">
+            <div class="login__brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg class="icon"><use href="#i-cap"></use></svg>
+                </span>
+                <span class="brand-text">
+                    <strong>Student Feedback System</strong>
+                    <small>Administration Console</small>
+                </span>
+            </div>
+
+            <div class="login__hero">
+                <h1>Listening to students, improving teaching.</h1>
+                <hr class="login__rule">
+                <p>Review feedback submissions, compare faculty and course ratings, and generate reports from one secure administration area.</p>
+                <div class="login__stars" aria-hidden="true">
+                    <svg class="icon"><use href="#i-star"></use></svg>
+                    <svg class="icon"><use href="#i-star"></use></svg>
+                    <svg class="icon"><use href="#i-star"></use></svg>
+                    <svg class="icon"><use href="#i-star"></use></svg>
+                    <svg class="icon"><use href="#i-star"></use></svg>
+                </div>
+            </div>
+
+            <small>B.Tech academic project &middot; Admin module</small>
+        </section>
+
+        <main class="login__main" id="main-content">
+            <div class="login-card">
+                <h2>Administrator sign in</h2>
+                <p class="lead">Enter your credentials to access the dashboard.</p>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="flash flash--{{ category if category in ('success', 'error', 'warning') else 'info' }}" role="{{ 'alert' if category == 'error' else 'status' }}">
+                            <svg class="icon" aria-hidden="true"><use href="#{{ 'i-check' if category == 'success' else 'i-alert' }}"></use></svg>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('login') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="field">
+                        <label for="username">Admin username</label>
+                        <div class="input-icon">
+                            <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+                            <input class="control" type="text" id="username" name="username"
+                                   required autofocus autocomplete="username"
+                                   autocapitalize="none" spellcheck="false">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <div class="password-wrap">
+                            <input class="control" type="password" id="password" name="password"
+                                   required autocomplete="current-password">
+                            <button class="password-toggle" id="password-toggle" type="button"
+                                    aria-label="Show password" aria-pressed="false" hidden>
+                                <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn--primary btn--block" type="submit">Sign in</button>
+                </form>
+
+                <p class="login-note">Authorised administrators only.</p>
+            </div>
+
+            <p class="login-footer">College Student Feedback System &mdash; Admin Module</p>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
