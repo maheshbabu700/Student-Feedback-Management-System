@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% from "_macros.html" import stars, summary_table with context %}
+
+{% block title %}Dashboard{% endblock %}
+{% block eyebrow %}Overview{% endblock %}
+{% block page_title %}Welcome back, {{ session.get('admin_username', 'Admin') }}{% endblock %}
+{% block page_subtitle %}A summary of student feedback submissions and ratings across faculty and courses.{% endblock %}
+
+{% block page_actions %}
+    <a class="btn btn--ghost" href="{{ url_for('feedback') }}">
+        <svg class="icon" aria-hidden="true"><use href="#i-records"></use></svg>
+        View feedback records
+    </a>
+{% endblock %}
+
+{% block content %}
+    {% set has_data = summary.total_submissions > 0 %}
+
+    <section class="kpis" aria-label="Key figures">
+        <article class="kpi">
+            <span class="kpi__icon" aria-hidden="true"><svg class="icon"><use href="#i-message"></use></svg></span>
+            <div>
+                <p class="kpi__label">Total submissions</p>
+                <p class="kpi__value">{{ summary.total_submissions }}</p>
+            </div>
+        </article>
+
+        <article class="kpi">
+            <span class="kpi__icon kpi__icon--gold" aria-hidden="true"><svg class="icon"><use href="#i-star"></use></svg></span>
+            <div>
+                <p class="kpi__label">Average rating</p>
+                <p class="kpi__value">{{ "%.2f"|format(summary.average_rating or 0) }}<small>/ 5</small></p>
+            </div>
+        </article>
+
+        <article class="kpi">
+            <span class="kpi__icon kpi__icon--teal" aria-hidden="true"><svg class="icon"><use href="#i-user"></use></svg></span>
+            <div>
+                <p class="kpi__label">Total faculty</p>
+                <p class="kpi__value">{{ summary.total_faculty }}</p>
+            </div>
+        </article>
+
+        <article class="kpi">
+            <span class="kpi__icon" aria-hidden="true"><svg class="icon"><use href="#i-book"></use></svg></span>
+            <div>
+                <p class="kpi__label">Total courses</p>
+                <p class="kpi__value">{{ summary.total_courses }}</p>
+            </div>
+        </article>
+    </section>
+
+    <div class="grid grid--main">
+        <section class="panel" aria-labelledby="dist-title">
+            <div class="panel__head">
+                <h2 id="dist-title">Rating distribution</h2>
+                <p>Number of feedback submissions for each star rating.</p>
+            </div>
+
+            {% if has_data %}
+                <div class="chart-box chart-box--lg">
+                    <canvas data-chart="rating" role="img" aria-label="Bar chart of feedback submissions for each star rating from 1 to 5"></canvas>
+                </div>
+                <p class="chart-fallback" data-chart-error hidden>
+                    <svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>
+                    The chart could not load. Check your internet connection and refresh the page.
+                </p>
+            {% else %}
+                <div class="empty">
+                    <svg class="icon" aria-hidden="true"><use href="#i-inbox"></use></svg>
+                    <strong>No feedback yet</strong>
+                    The rating chart will appear once students submit feedback.
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="panel" aria-labelledby="hl-title">
+            <div class="panel__head">
+                <h2 id="hl-title">Highlights</h2>
+                <p>Best-rated entries from the current data.</p>
+            </div>
+
+            {% if has_data %}
+                {% set top_faculty = faculty_report|sort(attribute='average_rating', reverse=true)|first %}
+                {% set top_course = course_report|sort(attribute='average_rating', reverse=true)|first %}
+                <div class="highlights">
+                    <div class="highlight">
+                        <span class="highlight__icon" aria-hidden="true"><svg class="icon"><use href="#i-trophy"></use></svg></span>
+                        <div>
+                            <small>Top-rated faculty</small>
+                            <strong>{{ top_faculty.category }}</strong>
+                            <span class="highlight__meta">{{ "%.2f"|format(top_faculty.average_rating or 0) }} / 5 &middot; {{ top_faculty.submission_count }} submission{{ '' if top_faculty.submission_count == 1 else 's' }}</span>
+                        </div>
+                    </div>
+                    <div class="highlight">
+                        <span class="highlight__icon" aria-hidden="true"><svg class="icon"><use href="#i-trophy"></use></svg></span>
+                        <div>
+                            <small>Top-rated course</small>
+                            <strong>{{ top_course.category }}</strong>
+                            <span class="highlight__meta">{{ "%.2f"|format(top_course.average_rating or 0) }} / 5 &middot; {{ top_course.submission_count }} submission{{ '' if top_course.submission_count == 1 else 's' }}</span>
+                        </div>
+                    </div>
+                    <div class="highlight">
+                        <span class="highlight__icon" aria-hidden="true"><svg class="icon"><use href="#i-star"></use></svg></span>
+                        <div>
+                            <small>Overall rating</small>
+                            <strong>{{ stars(summary.average_rating) }}</strong>
+                            <span class="highlight__meta">{{ "%.2f"|format(summary.average_rating or 0) }} out of 5</span>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty empty--sm">
+                    <svg class="icon" aria-hidden="true"><use href="#i-inbox"></use></svg>
+                    Highlights will show here once feedback is available.
+                </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <div class="grid grid--2">
+        <section class="panel" aria-labelledby="fac-title">
+            <div class="panel__head panel__head--row">
+                <h2 id="fac-title">Faculty summary</h2>
+                <a href="{{ url_for('reports') }}">Full report</a>
+            </div>
+            {{ summary_table(faculty_report, 'Faculty ID') }}
+        </section>
+
+        <section class="panel" aria-labelledby="crs-title">
+            <div class="panel__head panel__head--row">
+                <h2 id="crs-title">Course summary</h2>
+                <a href="{{ url_for('reports') }}">Full report</a>
+            </div>
+            {{ summary_table(course_report, 'Course ID', true) }}
+        </section>
+    </div>
+
+    <script id="chart-data" type="application/json">{{ {'rating': rating_distribution, 'faculty': faculty_report, 'course': course_report}|tojson }}</script>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

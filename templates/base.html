@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <title>{% block title %}Admin{% endblock %} | Student Feedback System</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="app">
+    {% include "_icons.html" %}
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <div class="shell">
+        <aside class="sidebar" id="sidebar" aria-label="Primary">
+            <div class="sidebar__brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg class="icon"><use href="#i-cap"></use></svg>
+                </span>
+                <span class="brand-text">
+                    <strong>Student Feedback</strong>
+                    <small>Administration Console</small>
+                </span>
+            </div>
+
+            <nav class="sidebar__nav" aria-label="Main navigation">
+                <p class="nav-heading">Menu</p>
+                <a href="{{ url_for('dashboard') }}"
+                   class="nav-link{% if request.endpoint == 'dashboard' %} is-active{% endif %}"
+                   {% if request.endpoint == 'dashboard' %}aria-current="page"{% endif %}>
+                    <svg class="icon"><use href="#i-dashboard"></use></svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('feedback') }}"
+                   class="nav-link{% if request.endpoint == 'feedback' %} is-active{% endif %}"
+                   {% if request.endpoint == 'feedback' %}aria-current="page"{% endif %}>
+                    <svg class="icon"><use href="#i-records"></use></svg>
+                    <span>Feedback Records</span>
+                </a>
+                <a href="{{ url_for('reports') }}"
+                   class="nav-link{% if request.endpoint == 'reports' %} is-active{% endif %}"
+                   {% if request.endpoint == 'reports' %}aria-current="page"{% endif %}>
+                    <svg class="icon"><use href="#i-reports"></use></svg>
+                    <span>Reports</span>
+                </a>
+            </nav>
+
+            <div class="sidebar__footer">
+                <div class="user-chip">
+                    <span class="avatar" aria-hidden="true">{{ (session.get('admin_username') or 'A')[:1]|upper }}</span>
+                    <span class="user-chip__text">
+                        <strong>{{ session.get('admin_username', 'admin') }}</strong>
+                        <small>Administrator</small>
+                    </span>
+                </div>
+                <form action="{{ url_for('logout') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn--sidebar" type="submit">
+                        <svg class="icon"><use href="#i-logout"></use></svg>
+                        Log out
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <div class="scrim" id="scrim" hidden></div>
+
+        <div class="content">
+            <header class="topbar">
+                <button class="icon-btn menu-toggle" id="menu-toggle" type="button"
+                        aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">
+                    <svg class="icon"><use href="#i-menu"></use></svg>
+                </button>
+                <span class="topbar__title">Student Feedback System</span>
+            </header>
+
+            <main class="main" id="main-content" tabindex="-1">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-stack">
+                        {% for category, message in messages %}
+                            <div class="flash flash--{{ category if category in ('success', 'error', 'warning') else 'info' }}" role="{{ 'alert' if category == 'error' else 'status' }}">
+                                <svg class="icon"><use href="#{{ 'i-check' if category == 'success' else 'i-alert' }}"></use></svg>
+                                <span>{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <div class="page-header">
+                    <div>
+                        <p class="eyebrow">{% block eyebrow %}Administration{% endblock %}</p>
+                        <h1>{% block page_title %}{% endblock %}</h1>
+                        <p class="page-header__sub">{% block page_subtitle %}{% endblock %}</p>
+                    </div>
+                    {% block page_actions %}{% endblock %}
+                </div>
+
+                {% block content %}{% endblock %}
+            </main>
+
+            <footer class="site-footer">
+                <span>College Student Feedback System &mdash; Admin Module</span>
+                <span>Academic project &middot; Sample data for demonstration</span>
+            </footer>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

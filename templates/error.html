@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+{% block eyebrow %}Something went wrong{% endblock %}
+{% block page_title %}Data could not be loaded{% endblock %}
+{% block page_subtitle %}The feedback database could not be read just now.{% endblock %}
+
+{% block content %}
+    <section class="panel">
+        <div class="empty">
+            <svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>
+            <strong>Please try again</strong>
+            If the problem continues, check that <code>database/test_feedback.db</code> exists and is not locked
+            by another program, then refresh this page.
+            <p style="margin-top: 16px;"><a class="btn btn--ghost" href="{{ url_for('dashboard') }}">Back to dashboard</a></p>
+        </div>
+    </section>
+{% endblock %}
