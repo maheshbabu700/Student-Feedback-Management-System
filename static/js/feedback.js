@@ -7,17 +7,29 @@
 // Later, the backend can provide these lists from the database.
 // "id" becomes the value sent as faculty_id / course_id.
 const FACULTY_LIST = [
+  { id: "F100", name: "Prof. Jeevan Kumar"},
   { id: "F101", name: "Dr. A. Sharma" },
   { id: "F102", name: "Prof. B. Reddy" },
   { id: "F103", name: "Dr. C. Nair" },
-  { id: "F104", name: "Prof. D. Iyer" }
+  { id: "F104", name: "Prof. D. Iyer" },
+  { id: "F105", name: "Dr. E. Gupta" },
+  { id: "F106", name: "Prof. F. Mehta" },
+  { id: "F107", name: "Dr. G. Rao" },
+  { id: "F108", name: "Prof. H. Singh" },
+  { id: "F109", name: "Dr. I. Verma" }
 ];
 
 const COURSE_LIST = [
+  { id: "C200", name: "Full Stack Development"},
   { id: "C201", name: "Python Programming" },
   { id: "C202", name: "Java Programming" },
   { id: "C203", name: "Database Management Systems (DBMS)" },
-  { id: "C204", name: "Data Structures" }
+  { id: "C204", name: "Data Structures" },
+  { id: "C205", name: "Algorithms" },
+  { id: "C206", name: "Operating Systems" },
+  { id: "C207", name: "Computer Networks" },
+  { id: "C208", name: "Software Engineering" },
+  { id: "C209", name: "Artificial Intelligence" }
 ];
 
 // Star labels: index 0 = 1 star
@@ -204,8 +216,8 @@ function validateForm() {
 }
 
 // ---- Events ------------------------------------------------
-form.addEventListener("submit", function (event) {
-  event.preventDefault();      // stop the page from reloading
+form.addEventListener("submit", async function (event) {
+  event.preventDefault();
   clearAllErrors();
 
   const feedbackData = validateForm();
@@ -216,20 +228,46 @@ form.addEventListener("submit", function (event) {
     return;
   }
 
-  // Visible to developers only: shows the organised data for the backend phase
-  console.log("Validated feedback (not saved):", feedbackData);
+  const submitButton = form.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  submitButton.textContent = "Submitting...";
+  formStatus.textContent = "Saving your feedback...";
+  formStatus.className = "status";
 
-  formStatus.textContent = "";
-  const heading = document.createElement("strong");
-  heading.textContent = "Form validated successfully.";
-  formStatus.appendChild(heading);
-  formStatus.appendChild(document.createTextNode(
-    "This is a frontend-only demo, so your feedback has not been saved or sent anywhere."));
-  formStatus.className = "status success";
+  try {
+    // Send the validated form data to the Flask API. This page must be
+    // opened through the Flask server (http://127.0.0.1:5000/).
+    const response = await fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(feedbackData)
+    });
 
-  form.reset();
-  resetRating();
-  formStatus.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    const result = await response.json().catch(function () { return {}; });
+
+    if (!response.ok || !result.success) {
+      if (result.errors) {
+        Object.keys(result.errors).forEach(function (field) {
+          showError(field, result.errors[field]);
+        });
+      }
+      throw new Error(result.message || "Feedback could not be saved. Please try again.");
+    }
+
+    formStatus.textContent = "Feedback submitted and saved successfully. Thank you!";
+    formStatus.className = "status success";
+    form.reset();
+    resetRating();
+  } catch (error) {
+    formStatus.textContent = error.message ||
+      "Could not connect to the server. Open the form through the Flask application and try again.";
+    formStatus.className = "status fail";
+    console.error("Feedback submission failed:", error);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Submit feedback";
+    formStatus.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
 });
 
 // Clear a field's error as soon as the user fixes it
